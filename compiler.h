@@ -15,3 +15,9 @@ char keywords[NUMBER_OF_KEYWORDS][MAX_TOKEN_SIZE] = {
     "class", "function", "constructor", "method", "static",
     "field", "int",      "char",        "bool",   "Array",
 };
+
+typedef struct {
+  char *value;
+  char *type;
+  char *representation;
+} token_t;

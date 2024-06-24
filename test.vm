@@ -63,7 +63,7 @@
 <symbol> . </symbol>
 <identifier> readInt </identifier>
 <symbol> ( </symbol>
-<stringConstant> pENTER THE NEXT NUMBER: </stringConstant>
+<stringConstant>  ENTER THE NEXT NUMBER: </stringConstant>
 <symbol> ) </symbol>
 <symbol> ; </symbol>
 <identifier> let </identifier>

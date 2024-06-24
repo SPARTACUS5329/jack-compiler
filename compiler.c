@@ -93,39 +93,55 @@ bool isIdentifier(const char *token) {
   return true;
 }
 
-void addToken(char *tokenContainer, const char *token) {
+void addToken(token_t *tokenContainer, const char *token) {
   if (isKeyword(token)) {
-    sprintf(tokenContainer, "<keyword> %s </keyword>", token);
+    sprintf(tokenContainer->type, "keyword");
+    sprintf(tokenContainer->value, "%s", token);
+    sprintf(tokenContainer->representation, "<keyword> %s </keyword>", token);
   } else if (isSymbol(*token)) {
-    sprintf(tokenContainer, "<symbol> %c </symbol>", *token);
+    sprintf(tokenContainer->type, "symbol");
+    sprintf(tokenContainer->value, "%c", *token);
+    sprintf(tokenContainer->representation, "<symbol> %c </symbol>", *token);
   } else if (isIntegerConstant(token)) {
-    sprintf(tokenContainer, "<integerConstant> %s </integerConstant>", token);
+    sprintf(tokenContainer->type, "integerConstant");
+    sprintf(tokenContainer->value, "%s", token);
+    sprintf(tokenContainer->representation,
+            "<integerConstant> %s </integerConstant>", token);
   } else if (isStringConstant(token)) {
     char stringConstant[strlen(token) - 2];
     for (int i = 1; i < strlen(token) - 1; i++) {
       stringConstant[i] = token[i];
     }
     stringConstant[strlen(token) - 2] = '\0';
-    sprintf(tokenContainer, "<stringConstant> %s </stringConstant>",
-            stringConstant);
+    sprintf(tokenContainer->type, "stringConstant");
+    sprintf(tokenContainer->value, "%s", stringConstant);
+    sprintf(tokenContainer->representation,
+            "<stringConstant> %s </stringConstant>", stringConstant);
   } else if (isIdentifier(token)) {
-    sprintf(tokenContainer, "<identifier> %s </identifier>", token);
+    sprintf(tokenContainer->type, "identifier");
+    sprintf(tokenContainer->value, "%s", token);
+    sprintf(tokenContainer->representation, "<identifier> %s </identifier>",
+            token);
   } else {
     error("[addToken] Invalid token");
   }
 }
 
-char **tokenize(char *buffer) {
+token_t **tokenize(char *buffer) {
   int currIndex = 0;
   bool isTokenValid = false;
   char *currToken = malloc(MAX_TOKEN_SIZE * sizeof(char));
   if (currToken == NULL)
     error("[tokenize] Memory allocation error: currToken");
-  char **tokens = malloc(MAX_TOKENS * sizeof(char *));
+  token_t **tokens = malloc(MAX_TOKENS * sizeof(token_t *));
   if (tokens == NULL)
     error("[tokenize] Memory allocation error: tokens");
-  for (int i = 0; i < MAX_TOKENS; i++)
-    tokens[i] = malloc(MAX_TOKEN_SIZE * sizeof(char));
+  for (int i = 0; i < MAX_TOKENS; i++) {
+    tokens[i] = malloc(sizeof(token_t));
+    tokens[i]->value = malloc(MAX_TOKEN_SIZE * sizeof(char));
+    tokens[i]->type = malloc(20 * sizeof(char));
+    tokens[i]->representation = malloc((MAX_TOKEN_SIZE + 50) * sizeof(char));
+  }
 
   while (buffer[currIndex] != '\0') {
     char currChar = buffer[currIndex];
@@ -177,7 +193,7 @@ char **tokenize(char *buffer) {
 
   int i = 0;
   do {
-    printf("%s\n", tokens[i]);
+    printf("%s\n", tokens[i]->value);
   } while (++i < tokenCount);
 
   return tokens;
@@ -253,8 +269,8 @@ void translateFile(const char *readStream, const char *writeStream) {
 
   char *buffer = initialize(readStream);
   printf("\nTranslating %s...\n\n", readStream);
-  char **tokens = tokenize(buffer);
-  writeToFile(tokens, writeStream);
+  token_t **tokens = tokenize(buffer);
+  // writeToFile(tokens, writeStream);
   printf("Successfully translated!\n");
 }
 
